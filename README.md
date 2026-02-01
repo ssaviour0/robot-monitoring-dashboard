@@ -1,11 +1,9 @@
-# 실시간 로봇 모니터링 웹 대시보드  
-**Web-First Digital Twin Viewer** (개인 포트폴리오 프로젝트)
+# Client-side real-time robot monitoring dashboard with 3D digital twin visualization
 
-[![Vercel](https://therealsujitk-vercel-badge.vercel.app/?app=robot-monitoring-dashboard)](https://robot-monitoring-dashboard.vercel.app)
-[![GitHub](https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white)](https://github.com/yourusername/robot-monitoring-dashboard)
-[![React](https://img.shields.io/badge/React-20232A?style=flat&logo=react&logoColor=61DAFB)](https://react.dev)
-[![Three.js](https://img.shields.io/badge/Three.js-000000?style=flat&logo=three.js&logoColor=white)](https://threejs.org)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+React, @react-three/fiber, Zustand. Simulated data for scalable, zero-server-cost monitoring (ROS2 integration ready).
+
+[![Vercel Deployment](https://img.shields.io/badge/Deploy-Vercel-black?style=for-the-badge&logo=vercel)](https://robot-monitoring-dashboard.vercel.app/)
+[![GitHub](https://img.shields.io/badge/GitHub-Repository-blue?style=for-the-badge&logo=github)](https://github.com/ssaviour0/robot-monitoring-dashboard.git)
 
 산업용 디지털 트윈 모니터링 시스템의 **클라이언트 중심 고성능 웹 프론트엔드** 구현 프로젝트입니다.  
 실무에서 서버 중심 스트리밍 방식의 구조적 한계(고비용 GPU 서버, 확장성 제약, 자원 낭비)를 인지하고, **클라이언트 측 3D 렌더링 + 모의 실시간 데이터** 접근으로 서버 부하를 최소화하고 무제한 확장성을 목표로 개인 R&D했습니다.
@@ -16,9 +14,9 @@
 🔗 **라이브 데모**: [https://robot-monitoring-dashboard.vercel.app](https://robot-monitoring-dashboard.vercel.app)  
 (글로벌 CDN 정적 배포 → OPEX zero, 60fps 부드러운 애니메이션)
 
-<!-- 스크린샷 공간 1: 메인 대시보드 전체 뷰 -->
+<!-- 스크린샷 공간 1: 메인 대시보드 뷰 -->
 ![메인 대시보드 뷰](docs/screenshots/main-dashboard.png)  
-*(메인 3D 캔버스 + 조인트/텔레메트리 패널이 함께 보이는 전체 화면)*
+*(메인 3D 캔버스 + 실시간 조인트/텔레메트리 패널)*
 
 ### 프로젝트 배경 & 동기
 실무 디지털 트윈 프로젝트 경험 중 발견한 핵심 문제점:
@@ -27,13 +25,13 @@
 2. **확장성 한계**: 네트워크 대역폭 + 동시 세션 물리적 제한  
 3. **자원 낭비**: 단순 read-only 모니터링 사용자에게도 과도한 서버 컴퓨팅 할당  
 
-→ **클라이언트 측 고성능 3D 렌더링** + **requestAnimationFrame 기반 모의 실시간 시뮬레이션**으로 해결  
+→ **클라이언트 측 고성능 3D 렌더링** + **추론 기반의 자연스러운 모의 실시간 시뮬레이션**으로 해결  
 → 서버 의존성 최소화 → 비용 절감 + 무한 사용자 확장 가능
 
 ### 주요 특징
 - @react-three/fiber + drei 기반 **클라이언트 측 100% 3D 렌더링**
-- Zustand로 joint angles, base pose, battery 등 **모의 데이터 바인딩**
-- requestAnimationFrame + easing 함수로 **자연스러운 simulated real-time 애니메이션** (60fps 타겟)
+- Zustand로 joint angles, telemetry 등 **모의 데이터 바인딩**
+- **포즈 기반 보간(Interpolation)** 알고리즘으로 구현된 **자연스러운 로봇 움직임**
 - glTF/GLB **Draco + Meshopt 압축** 최적화 (평균 15~20MB → 빠른 초기 로드)
 - **Vercel 정적 배포** (zero 서버 비용, 글로벌 CDN)
 - 실제 ROS2 토픽 스키마 기반 시뮬레이션 → 실 ROS2 연결 시 UI/훅 재사용 용이
@@ -41,11 +39,11 @@
 
 <!-- GIF 공간: 로봇 움직임 애니메이션 데모 -->
 ![로봇 joint 움직임 GIF](docs/gifs/robot-animation.gif)  
-*(조인트 각도 변화 + base pose 이동 + telemetry 실시간 업데이트 예시 – 5~8초 루프)*
+*(정교하게 보간된 조인트 각도 변화 + telemetry 실시간 업데이트)*
 
 <!-- 스크린샷 공간 2: 세부 패널 확대 (옵션) -->
 ![조인트 컨트롤 & 텔레메트리 패널](docs/screenshots/joint-telemetry-panel.png)  
-*(조인트 슬라이더/입력 + 배터리/속도/상태 표시 예시)*
+*(실시간 상태 모니터링 및 개별 조인트 수동 제어 인터페이스)*
 
 ### 아키텍처 비교 (산업 표준 vs 본 프로젝트)
 
@@ -71,7 +69,7 @@
 ```
 src/
 ├── app/                  # 진입점, 라우팅, Provider
-├── core/                 # 범용 공통 (api, utils, base hooks – 얇게!)
+├── core/                 # 범용 공통 (api, utils, base hooks)
 ├── features/
 │   └── robot/            # 메인 기능: 로봇 모니터링 (colocation 최대화)
 │       ├── components/   # RobotCanvas, JointsPanel, TelemetryCard 등
@@ -93,26 +91,30 @@ nvm install 22
 nvm use 22
 
 # 클론 & 설치
-git clone https://github.com/yourusername/robot-monitoring-dashboard.git
+git clone https://github.com/ssaviour0/robot-monitoring-dashboard.git
 cd robot-monitoring-dashboard
 pnpm install   # or npm install / yarn
 
 # 개발 서버
 pnpm dev
 
-# 빌드 & 프리뷰
+# 린트 검사 (코드 스타일 및 잠재적 에러)
+pnpm lint
+
+# 빌드 검사 (TypeScript 타입 체크 + 정적 파일 생성)
 pnpm build
+
+# 빌드 결과물 미리보기
 pnpm preview
 ```
 
 ### 향후 계획 / 확장 포인트
 - **ROS2 Bridge** 연결 (`features/robot/services/rosBridge.ts` 추가 → 기존 훅에서 simulated → real-time 데이터 전환)
-- Multi-robot fleet view
-- WebXR (AR/VR) 모드 탐구
-- Performance profiling + WebGPU fallback
+- **WebXR (AR/VR)** 모드 탐구 (몰입형 관제 경험)
+- **Performance profiling** + WebGPU fallback
+- **다양한 로봇 모델** 지원 (Delta, Scara 등 kinematics 확장)
 
 ### 라이선스
 MIT License – 자유롭게 사용/수정/포크 가능 (출처 표기 부탁드려요 🙏)
 
 피드백이나 Pull Request 언제든 환영합니다! 🚀
-```
