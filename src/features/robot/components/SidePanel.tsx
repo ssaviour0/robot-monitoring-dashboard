@@ -1,5 +1,5 @@
 import { Box, Typography, Divider } from '@mui/material';
-import { Bolt, Speed, Thermostat, Info } from '@mui/icons-material';
+import { Bolt, Thermostat, Info } from '@mui/icons-material';
 import { useRobotStore } from '../store/robotStore';
 import { TelemetryCard } from './TelemetryCard';
 import { JointControlPanel } from './JointControlPanel';

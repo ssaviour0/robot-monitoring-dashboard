@@ -1,4 +1,4 @@
-import { Box, Typography, Slider, Divider } from '@mui/material';
+import { Box, Typography, Slider } from '@mui/material';
 import { useRobotStore } from '../store/robotStore';
 
 export const JointControlPanel = () => {

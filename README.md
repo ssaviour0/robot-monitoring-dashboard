@@ -14,8 +14,7 @@ React, @react-three/fiber, Zustand. Simulated data for scalable, zero-server-cos
 🔗 **라이브 데모**: [https://robot-monitoring-dashboard.vercel.app](https://robot-monitoring-dashboard.vercel.app)  
 (글로벌 CDN 정적 배포 → OPEX zero, 60fps 부드러운 애니메이션)
 
-<!-- 스크린샷 공간 1: 메인 대시보드 뷰 -->
-![메인 대시보드 뷰](docs/screenshots/main-dashboard.png)  
+![메인 대시보드 뷰](docs/screenshots/joint-telemetry-panel.png
 *(메인 3D 캔버스 + 실시간 조인트/텔레메트리 패널)*
 
 ### 프로젝트 배경 & 동기
@@ -36,14 +35,6 @@ React, @react-three/fiber, Zustand. Simulated data for scalable, zero-server-cos
 - **Vercel 정적 배포** (zero 서버 비용, 글로벌 CDN)
 - 실제 ROS2 토픽 스키마 기반 시뮬레이션 → 실 ROS2 연결 시 UI/훅 재사용 용이
 - Feature-Sliced Design (FSD) 기반 **확장성 높은 구조**
-
-<!-- GIF 공간: 로봇 움직임 애니메이션 데모 -->
-![로봇 joint 움직임 GIF](docs/gifs/robot-animation.gif)  
-*(정교하게 보간된 조인트 각도 변화 + telemetry 실시간 업데이트)*
-
-<!-- 스크린샷 공간 2: 세부 패널 확대 (옵션) -->
-![조인트 컨트롤 & 텔레메트리 패널](docs/screenshots/joint-telemetry-panel.png)  
-*(실시간 상태 모니터링 및 개별 조인트 수동 제어 인터페이스)*
 
 ### 아키텍처 비교 (산업 표준 vs 본 프로젝트)
 
@@ -109,6 +100,7 @@ pnpm preview
 ```
 
 ### 향후 계획 / 확장 포인트
+
 - **ROS2 Bridge** 연결 (`features/robot/services/rosBridge.ts` 추가 → 기존 훅에서 simulated → real-time 데이터 전환)
 - **WebXR (AR/VR)** 모드 탐구 (몰입형 관제 경험)
 - **Performance profiling** + WebGPU fallback
