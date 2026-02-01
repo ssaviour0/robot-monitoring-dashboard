@@ -11,10 +11,10 @@ React, @react-three/fiber, Zustand. Simulated data for scalable, zero-server-cos
 (실제 ROS2/WebSocket 연결 시 동일 UI 구조와 대부분의 로직 재사용 가능하도록 설계)
 
 ### 데모
-🔗 **라이브 데모**: [https://robot-monitoring-dashboard.vercel.app](https://robot-monitoring-dashboard.vercel.app)  
+🔗 **라이브 데모**: [https://robot-monitoring-dashboard.vercel.app](https://robot-monitoring-dashboard.vercel.app/)  
 (글로벌 CDN 정적 배포 → OPEX zero, 60fps 부드러운 애니메이션)
 
-![메인 대시보드 뷰](docs/screenshots/joint-telemetry-panel.png
+![메인 대시보드 뷰](docs/screenshots/joint-telemetry-panel.png)
 *(메인 3D 캔버스 + 실시간 조인트/텔레메트리 패널)*
 
 ### 프로젝트 배경 & 동기
