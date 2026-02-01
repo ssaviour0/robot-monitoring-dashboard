@@ -46,11 +46,15 @@ export const TelemetryCard = ({ label, value, unit, icon, progress, color = 'pri
         <Card sx={{
             p: 2,
             mb: 2,
-            bgcolor: 'background.paper',
+            bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(16, 37, 61, 0.7)' : 'background.paper',
+            backdropFilter: 'blur(10px)',
             borderLeft: `4px solid`,
             borderColor: `${color}.main`,
+            border: (theme) => theme.palette.mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.05)' : 'none',
+            borderLeftWidth: '4px',
             position: 'relative',
-            overflow: 'hidden'
+            overflow: 'hidden',
+            boxShadow: (theme) => theme.palette.mode === 'dark' ? '0 8px 32px 0 rgba(0, 0, 0, 0.37)' : '0 2px 8px rgba(0,0,0,0.05)',
         }}>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                 {icon}

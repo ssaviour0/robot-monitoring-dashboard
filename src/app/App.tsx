@@ -39,123 +39,147 @@ function App() {
         <ThemeProvider theme={theme}>
             <CssBaseline />
             <ErrorBoundary>
-                <Box sx={{ display: 'flex', height: '100vh', bgcolor: 'background.default', overflow: 'hidden' }}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh', bgcolor: 'background.default', overflow: 'hidden' }}>
 
-                    {/* Responsive Side Panel */}
-                    {isMobile ? (
-                        <Drawer
-                            variant="temporary"
-                            anchor="left"
-                            open={mobileOpen}
-                            onClose={handleDrawerToggle}
-                            ModalProps={{ keepMounted: true }}
-                            sx={{
-                                display: { xs: 'block', md: 'none' },
-                                '& .MuiDrawer-paper': { width: 320, bgcolor: 'background.default' },
-                            }}
-                        >
-                            <Box sx={{ display: 'flex', justifyContent: 'flex-end', p: 1 }}>
-                                <IconButton onClick={handleDrawerToggle}>
-                                    <ChevronRight sx={{ transform: 'rotate(180deg)' }} />
-                                </IconButton>
-                            </Box>
-                            <SidePanel />
-                        </Drawer>
-                    ) : (
-                        <SidePanel />
-                    )}
-
-                    {/* Main Content Area */}
+                    {/* Top Header Layer (Full Width) */}
                     <Box sx={{
-                        flexGrow: 1,
+                        px: { xs: 2, md: 3 },
+                        py: { xs: 1.5, md: 0 },
+                        borderBottom: (theme) => `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)'}`,
+                        height: { xs: 'auto', md: '110px' },
+                        minHeight: { xs: '64px', md: '110px' },
                         display: 'flex',
-                        flexDirection: 'column',
-                        width: { md: `calc(100% - 320px)` },
-                        transition: theme.transitions.create(['margin', 'width'], {
-                            easing: theme.transitions.easing.sharp,
-                            duration: theme.transitions.duration.leavingScreen,
-                        }),
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        zIndex: 1100,
+                        bgcolor: 'background.default'
                     }}>
-                        <Box sx={{
-                            p: { xs: 2, md: 3 },
-                            borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-between'
-                        }}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                                <Box>
-                                    <Typography variant={isMobile ? "subtitle1" : "h5"} color="primary" sx={{ fontWeight: 700, letterSpacing: 1 }}>
-                                        ROBOT MONITORING
-                                    </Typography>
-                                    {!isMobile && (
-                                        <Box sx={{ display: 'flex', gap: 2 }}>
-                                            <Typography variant="caption" color="text.secondary" sx={{ textTransform: 'uppercase' }}>
-                                                Viewer v1.0
-                                            </Typography>
-                                            <Typography variant="caption" color="primary" sx={{ fontWeight: 700 }}>
-                                                [READY]
-                                            </Typography>
-                                        </Box>
-                                    )}
-                                </Box>
-
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 2, md: 4 } }}>
+                            <Box>
+                                <Typography variant={isMobile ? "body1" : "h5"} color="primary" sx={{ fontWeight: 800, letterSpacing: 1, whiteSpace: 'nowrap' }}>
+                                    ROBOT MONITORING
+                                </Typography>
                                 {!isMobile && (
-                                    <Stack direction="row" spacing={3} sx={{ color: 'text.secondary' }}>
-                                        <Box>
-                                            <Typography variant="caption" display="block">MODE</Typography>
-                                            <Typography variant="body2" sx={{ fontWeight: 700, color: 'success.main' }}>SIMULATED</Typography>
-                                        </Box>
-                                        <Box>
-                                            <Typography variant="caption" display="block">POWER AVG</Typography>
-                                            <Typography variant="body2" sx={{ fontWeight: 700 }}>{powerConsumption}W</Typography>
-                                        </Box>
-                                        <Box>
-                                            <Typography variant="caption" display="block">STATUS</Typography>
-                                            <Typography variant="body2" sx={{ fontWeight: 700, color: 'primary.main' }}>NORMAL</Typography>
-                                        </Box>
-                                    </Stack>
+                                    <Box sx={{ display: 'flex', gap: 2 }}>
+                                        <Typography variant="caption" color="text.secondary" sx={{ textTransform: 'uppercase' }}>
+                                            Viewer v1.0
+                                        </Typography>
+                                        <Typography variant="caption" color="primary" sx={{ fontWeight: 700 }}>
+                                            [READY]
+                                        </Typography>
+                                    </Box>
                                 )}
                             </Box>
 
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                {!isMobile && (
-                                    <>
-                                        <Button
-                                            size="small"
-                                            startIcon={<RefreshIcon />}
-                                            onClick={() => window.location.reload()}
-                                            sx={{ color: 'text.secondary' }}
-                                        >
-                                            REFRESH
-                                        </Button>
-                                        <Button
-                                            size="small"
-                                            startIcon={<ResetIcon />}
-                                            onClick={() => useRobotStore.getState().resetRobot()}
-                                            sx={{ color: 'text.secondary' }}
-                                        >
-                                            RESET
-                                        </Button>
-                                        <IconButton size="small" color="inherit" onClick={toggleDarkMode}>
-                                            <DarkModeIcon color={darkMode ? 'primary' : 'inherit'} />
-                                        </IconButton>
-                                    </>
-                                )}
-                                {isMobile && (
-                                    <IconButton color="primary" onClick={handleDrawerToggle}>
+                            {/* Hide detailed stats on mobile header to save space */}
+                            {!isMobile && (
+                                <Stack direction="row" spacing={3} sx={{ color: 'text.secondary' }}>
+                                    <Box>
+                                        <Typography variant="caption" display="block">MODE</Typography>
+                                        <Typography variant="body2" sx={{ fontWeight: 700, color: 'success.main' }}>SIMULATED</Typography>
+                                    </Box>
+                                    <Box>
+                                        <Typography variant="caption" display="block">POWER AVG</Typography>
+                                        <Typography variant="body2" sx={{ fontWeight: 700 }}>{powerConsumption}W</Typography>
+                                    </Box>
+                                    <Box>
+                                        <Typography variant="caption" display="block">STATUS</Typography>
+                                        <Typography variant="body2" sx={{ fontWeight: 700, color: 'primary.main' }}>NORMAL</Typography>
+                                    </Box>
+                                </Stack>
+                            )}
+                        </Box>
+
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            {!isMobile ? (
+                                <>
+                                    <Button
+                                        size="small"
+                                        startIcon={<RefreshIcon />}
+                                        onClick={() => window.location.reload()}
+                                        sx={{ color: 'text.secondary' }}
+                                    >
+                                        REFRESH
+                                    </Button>
+                                    <Button
+                                        size="small"
+                                        startIcon={<ResetIcon />}
+                                        onClick={() => useRobotStore.getState().resetRobot()}
+                                        sx={{ color: 'text.secondary' }}
+                                    >
+                                        RESET
+                                    </Button>
+                                    <IconButton size="small" color="inherit" onClick={toggleDarkMode}>
+                                        <DarkModeIcon color={darkMode ? 'primary' : 'inherit'} />
+                                    </IconButton>
+                                </>
+                            ) : (
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                    <IconButton size="small" color="inherit" onClick={toggleDarkMode}>
+                                        <DarkModeIcon fontSize="small" color={darkMode ? 'primary' : 'inherit'} />
+                                    </IconButton>
+                                    <IconButton color="primary" onClick={handleDrawerToggle} edge="end">
                                         <MenuIcon />
                                     </IconButton>
-                                )}
+                                </Box>
+                            )}
+                        </Box>
+                    </Box>
+
+                    {/* Bottom Layer: Sidebar + Content */}
+                    <Box sx={{ display: 'flex', flexGrow: 1, overflow: 'hidden' }}>
+
+                        {/* Responsive Side Panel */}
+                        {isMobile ? (
+                            <Drawer
+                                variant="temporary"
+                                anchor="left"
+                                open={mobileOpen}
+                                onClose={handleDrawerToggle}
+                                ModalProps={{ keepMounted: true }}
+                                sx={{
+                                    display: { xs: 'block', md: 'none' },
+                                    '& .MuiDrawer-paper': { width: 320, bgcolor: 'background.default' },
+                                }}
+                            >
+                                <Box sx={{ display: 'flex', justifyContent: 'flex-end', p: 1 }}>
+                                    <IconButton onClick={handleDrawerToggle}>
+                                        <ChevronRight sx={{ transform: 'rotate(180deg)' }} />
+                                    </IconButton>
+                                </Box>
+                                <SidePanel />
+                            </Drawer>
+                        ) : (
+                            <SidePanel />
+                        )}
+
+                        {/* Main Content Area */}
+                        <Box sx={{
+                            flexGrow: 1,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            overflow: 'hidden', // Prevent main area from scrolling, internal components handle it
+                            position: 'relative',
+                            transition: theme.transitions.create(['margin', 'width'], {
+                                easing: theme.transitions.easing.sharp,
+                                duration: theme.transitions.duration.leavingScreen,
+                            }),
+                        }}>
+                            <Box sx={{
+                                flexGrow: 1,
+                                p: { xs: 1, md: 2 },
+                                width: '100%',
+                                height: '0px', // Flexbox trick to ensure it doesn't expand beyond parent
+                                minHeight: 0,
+                                position: 'relative'
+                            }}>
+                                <RobotCanvas />
                             </Box>
                         </Box>
-
-                        <Box sx={{ flexGrow: 1, p: { xs: 1, md: 2 }, position: 'relative' }}>
-                            <RobotCanvas />
-                        </Box>
-
-                        <Footer />
                     </Box>
+
+                    {/* Bottom Footer Layer (Full Width) */}
+                    <Footer />
                 </Box>
             </ErrorBoundary>
         </ThemeProvider>

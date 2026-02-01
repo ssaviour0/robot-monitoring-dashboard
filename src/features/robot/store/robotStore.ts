@@ -15,7 +15,7 @@ const initialState: RobotState = {
         status: 'idle',
     },
     settings: {
-        darkMode: true,
+        darkMode: false,
     },
 };
 

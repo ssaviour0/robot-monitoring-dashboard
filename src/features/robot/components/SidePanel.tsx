@@ -13,16 +13,22 @@ export const SidePanel = () => {
                 width: 320,
                 height: '100%',
                 bgcolor: 'background.default',
-                borderRight: { md: '1px solid rgba(255, 255, 255, 0.1)' },
+                borderRight: (theme) => `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)'}`,
                 display: 'flex',
                 flexDirection: 'column'
             }}
         >
-            <Box sx={{ p: 2, flexGrow: 1, overflowY: 'auto' }}>
-                <Typography variant="h6" sx={{ mb: 2, fontWeight: 700, color: 'primary.main', px: 1 }}>
+            {/* Sidebar Title Section */}
+            <Box sx={{ p: 3, pb: 0 }}>
+                <Typography variant="h6" sx={{ fontWeight: 700, color: 'primary.main', letterSpacing: 0.5 }}>
                     ROBOT STATUS
                 </Typography>
-                <Divider sx={{ mb: 3 }} />
+            </Box>
+
+            <Box sx={{ p: 2, flexGrow: 1, overflowY: 'auto' }}>
+                <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 2, fontWeight: 700, px: 1 }}>
+                    TELEMETRY
+                </Typography>
 
                 <TelemetryCard
                     label="Power"

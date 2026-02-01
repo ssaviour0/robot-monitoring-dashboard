@@ -12,33 +12,38 @@ export const Footer = () => {
     return (
         <Box
             sx={{
-                height: 32,
+                minHeight: 32,
+                py: { xs: 1, md: 0 },
                 bgcolor: 'background.paper',
-                borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+                borderTop: (theme) => `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)'}`,
                 display: 'flex',
+                flexDirection: { xs: 'column', sm: 'row' },
                 alignItems: 'center',
                 px: 2,
+                gap: { xs: 1, sm: 0 },
                 justifyContent: 'space-between',
                 zIndex: 1000,
             }}
         >
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                <Typography variant="caption" color="success.main" sx={{ fontWeight: 600 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 2 } }}>
+                <Typography variant="caption" color="success.main" sx={{ fontWeight: 600, whiteSpace: 'nowrap' }}>
                     SIMULATED MODE
                 </Typography>
                 <Divider orientation="vertical" flexItem sx={{ height: 12, my: 'auto' }} />
-                <Typography variant="caption" color="text.secondary">
+                <Typography variant="caption" color="text.secondary" sx={{ whiteSpace: 'nowrap' }}>
                     LATENCY: &lt;10ms
                 </Typography>
-                <Divider orientation="vertical" flexItem sx={{ height: 12, my: 'auto' }} />
-                <Typography variant="caption" color="text.secondary">
-                    FPS: 60
-                </Typography>
+                <Box sx={{ display: { xs: 'none', sm: 'flex' }, alignItems: 'center', gap: 2 }}>
+                    <Divider orientation="vertical" flexItem sx={{ height: 12, my: 'auto' }} />
+                    <Typography variant="caption" color="text.secondary">
+                        FPS: 60
+                    </Typography>
+                </Box>
             </Box>
 
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                <Typography variant="caption" color="text.secondary" sx={{ fontFamily: 'monospace' }}>
-                    LAST UPDATE: {time.toLocaleString()}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 2 } }}>
+                <Typography variant="caption" color="text.secondary" sx={{ fontFamily: 'monospace', fontSize: { xs: '0.65rem', sm: '0.75rem' } }}>
+                    LAST UPDATE: {time.toLocaleTimeString()}
                 </Typography>
                 <Divider orientation="vertical" flexItem sx={{ height: 12, my: 'auto' }} />
                 <Typography variant="caption" color="text.secondary">

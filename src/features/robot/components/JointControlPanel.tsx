@@ -5,8 +5,15 @@ export const JointControlPanel = () => {
     const { jointAngles, setJointAngle } = useRobotStore();
 
     return (
-        <Box sx={{ mt: 4, pb: 4 }}>
-            <Box sx={{ px: 1 }}>
+        <Box sx={{
+            mt: 2,
+            p: 2,
+            bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(16, 37, 61, 0.4)' : 'rgba(0, 0, 0, 0.02)',
+            borderRadius: '12px',
+            border: (theme) => theme.palette.mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.05)' : '1px solid rgba(0, 0, 0, 0.05)',
+            backdropFilter: 'blur(4px)'
+        }}>
+            <Box sx={{ px: 0.5 }}>
                 {jointAngles.map((angle, index) => {
                     const degreeValue = Math.round(angle * (180 / Math.PI));
 
@@ -54,6 +61,7 @@ export const JointControlPanel = () => {
                                 onChange={(_, value) => setJointAngle(index, value as number)}
                                 sx={{
                                     color: 'primary.main',
+                                    py: 1, // Add vertical padding to slider for better legibility
                                     '& .MuiSlider-thumb': {
                                         width: 10,
                                         height: 10,
