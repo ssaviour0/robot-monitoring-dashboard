@@ -12,7 +12,6 @@ React, @react-three/fiber, Zustand. Simulated data for scalable, zero-server-cos
 
 ### 데모
 🔗 **라이브 데모**: [https://robot-monitoring-dashboard.vercel.app](https://robot-monitoring-dashboard.vercel.app/)  
-(글로벌 CDN 정적 배포 → OPEX zero, 60fps 부드러운 애니메이션)
 
 ![메인 대시보드 뷰](docs/screenshots/joint-telemetry-panel.png)
 *(메인 3D 캔버스 + 실시간 조인트/텔레메트리 패널)*
@@ -101,6 +100,7 @@ pnpm preview
 
 ### 향후 계획 / 확장 포인트
 
+- **리깅(Bone/Skinning) 데이터 확보**: 현재 보유한 GLB 데이터에는 본(Bone) 정보가 포함되어 있지 않아 개별 관절 조작이 불가능한 상태임. 향후 리깅된(Rigged) 모델을 확보하여 정밀한 관절 애니메이션 및 제어 기능 구현 예정
 - **ROS2 Bridge** 연결 (`features/robot/services/rosBridge.ts` 추가 → 기존 훅에서 simulated → real-time 데이터 전환)
 - **WebXR (AR/VR)** 모드 탐구 (몰입형 관제 경험)
 - **Performance profiling** + WebGPU fallback
