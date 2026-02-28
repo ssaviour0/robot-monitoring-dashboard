@@ -62,7 +62,7 @@ function App() {
                                 {!isMobile && (
                                     <Box sx={{ display: 'flex', gap: 2 }}>
                                         <Typography variant="caption" color="text.secondary" sx={{ textTransform: 'uppercase' }}>
-                                            Viewer v1.0
+                                            URDF Viewer v2.0
                                         </Typography>
                                         <Typography variant="caption" color="primary" sx={{ fontWeight: 700 }}>
                                             [READY]

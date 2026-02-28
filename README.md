@@ -27,10 +27,11 @@ React, @react-three/fiber, Zustand. Simulated data for scalable, zero-server-cos
 → 서버 의존성 최소화 → 비용 절감 + 무한 사용자 확장 가능
 
 ### 주요 특징
+- **URDF 기반 정밀 3D 렌더링**: `urdf-loader`를 사용하여 UR10 로봇의 URDF를 파싱, 실제 기구학적 구조와 관절 축을 완벽히 재현
 - @react-three/fiber + drei 기반 **클라이언트 측 100% 3D 렌더링**
-- Zustand로 joint angles, telemetry 등 **모의 데이터 바인딩**
-- **포즈 기반 보간(Interpolation)** 알고리즘으로 구현된 **자연스러운 로봇 움직임**
-- glTF/GLB **Draco + Meshopt 압축** 최적화 (평균 15~20MB → 빠른 초기 로드)
+- Zustand로 joint angles, telemetry 등 **실시간 데이터 바인딩**
+- **정밀 관절 제어**: URDF 표준에 따른 6축 로봇의 개별 관절(Shoulder, Elbow, Wrist) 실시간 조작 및 시각화
+- **고도화된 UI 오버레이**: Three.js Canvas 위에 띄워진 Glassmorphism 기반의 실시간 관절 상태 패널(JointPanel)
 - **Vercel 정적 배포** (zero 서버 비용, 글로벌 CDN)
 - 실제 ROS2 토픽 스키마 기반 시뮬레이션 → 실 ROS2 연결 시 UI/훅 재사용 용이
 - Feature-Sliced Design (FSD) 기반 **확장성 높은 구조**
@@ -39,72 +40,66 @@ React, @react-three/fiber, Zustand. Simulated data for scalable, zero-server-cos
 
 | 영역             | 산업 표준 (서버 중심)                          | 본 프로젝트 (클라이언트 중심)                          | 비고                              |
 |------------------|------------------------------------------------|-------------------------------------------------------|-----------------------------------|
-| 씬 정보 제공     | URDF/USD → 실시간 glTF 스트리밍                | glTF 2.0 / GLB 정적 파일 (public/assets)              | 서버 스트리밍 대신 정적 에셋      |
+| 씬 정보 제공     | URDF/USD → 실시간 glTF 스트리밍                | **URDF + DAE/STL Meshes** (public/urdf)              | 서버 스트리밍 대신 정적 URDF 구조 |
 | 설비 데이터 제공 | ROS2 + WebSocket 실시간 스트리밍               | React + requestAnimationFrame + Math 기반 시뮬레이션   | 실제 토픽 스키마 기반 모델링      |
-| 웹 렌더링        | 서버 측 렌더링 + WebRTC/스트리밍               | React 18 + @react-three/fiber + drei + MUI + Zustand  | 핵심 구현 영역 (95% 이상)         |
+| 웹 렌더링        | 서버 측 렌더링 + WebRTC/스트리밍               | React 18 + @react-three/fiber + urdf-loader + Zustand | 핵심 구현 영역 (95% 이상)         |
 
 **데이터 흐름**  
-`glTF/GLB 로드` → `Zustand 모의 데이터 업데이트 (60fps)` → `Three.js 클라이언트 렌더링` → `대시보드 UI`
+`URDF/Mesh 로드` → `Zustand 실시간 데이터 업데이트 (60fps)` → `urdf-loader 관절 업데이트` → `Three.js 렌더링`
 
 ### 기술 스택 (2026 기준 최신)
-- **Core**: React 18 + TypeScript, Vite 5, @react-three/fiber, @react-three/drei, three.js  
+- **Core**: React 18 + TypeScript, Vite 5, @react-three/fiber, urdf-loader, three.js  
 - **상태 관리**: Zustand – boilerplate 적고 feature-sliced 구조에 최적  
 - **UI**: Material-UI (MUI v5) – 산업용 느낌의 컴포넌트 빠른 구현  
 - **시뮬레이션**: requestAnimationFrame + lerp/easing – 부드러운 움직임  
-- **에셋 최적화**: glTF/GLB (Draco + Meshopt 압축) – 파일 크기 60~70% ↓  
 - **배포**: Vercel – 정적 호스팅, Preview, zero-config CI/CD  
-- **개발 도구**: ESLint + Prettier + Husky, GitHub Actions + Vercel
 
 ### 프로젝트 구조 (Feature-Sliced Design 기반)
 ```
 src/
-├── app/                  # 진입점, 라우팅, Provider
-├── core/                 # 범용 공통 (api, utils, base hooks)
+├── app/                  # 진입점, 글로벌 테마, 레이아웃
 ├── features/
-│   └── robot/            # 메인 기능: 로봇 모니터링 (colocation 최대화)
-│       ├── components/   # RobotCanvas, JointsPanel, TelemetryCard 등
-│       ├── hooks/        # useRobotAnimation, useSimulatedData 등
+│   └── robot/            # 메인 기능: 로봇 모니터링
+│       ├── components/   # RobotCanvas, JointPanel, ControlToolbar 등
+│       ├── hooks/        # useRosBridge, useRobotJoints 등
 │       ├── store/        # robotStore.ts (Zustand)
-│       ├── services/     # simulationEngine.ts
-│       ├── types/        # RobotState, JointAngles 등
-│       └── index.ts      # barrel export
-├── pages/                # DashboardPage.tsx (조립소 역할)
-├── shared/               # atomic UI (Gauge, StatBadge, layouts)
-└── assets/               # 글로벌 이미지 등 (기능별 에셋은 features/robot/assets/)
+│       ├── services/     # mockRosService.ts (시뮬레이션 엔진)
+│       ├── types/        # robot.ts, ros.ts
+│       └── utils/        # joint.utils.ts
+├── shared/               # 공통 UI 컴포넌트 및 스타일
+└── public/
+    └── urdf/             # 로봇 모델 정의 및 3D 메쉬 (UR10)
 ```
 
 ### 설치 & 실행 (From Scratch)
 
 ```bash
-# Node.js 22.x LTS (2026 Active LTS)
-nvm install 22
-nvm use 22
-
-# 클론 & 설치
+# 1. 클론
 git clone https://github.com/ssaviour0/robot-monitoring-dashboard.git
 cd robot-monitoring-dashboard
-pnpm install   # or npm install / yarn
 
-# 개발 서버
+# 2. 의존성 설치
+pnpm install
+
+# 3. 로봇 3D 에셋 다운로드 (필수)
+# URDF 로딩에 필요한 DAE/STL 메쉬 파일을 공식 리포지토리에서 가져옵니다.
+chmod +x scripts/download_ur10_assets.sh
+./scripts/download_ur10_assets.sh
+
+# 4. 개발 서버 시작
 pnpm dev
-
-# 린트 검사 (코드 스타일 및 잠재적 에러)
-pnpm lint
-
-# 빌드 검사 (TypeScript 타입 체크 + 정적 파일 생성)
-pnpm build
-
-# 빌드 결과물 미리보기
-pnpm preview
 ```
 
 ### 향후 계획 / 확장 포인트
 
-- **리깅(Bone/Skinning) 데이터 확보**: 현재 보유한 GLB 데이터에는 본(Bone) 정보가 포함되어 있지 않아 개별 관절 조작이 불가능한 상태임. 향후 리깅된(Rigged) 모델을 확보하여 정밀한 관절 애니메이션 및 제어 기능 구현 예정
-- **ROS2 Bridge** 연결 (`features/robot/services/rosBridge.ts` 추가 → 기존 훅에서 simulated → real-time 데이터 전환)
-- **WebXR (AR/VR)** 모드 탐구 (몰입형 관제 경험)
-- **Performance profiling** + WebGPU fallback
-- **다양한 로봇 모델** 지원 (Delta, Scara 등 kinematics 확장)
+- **실제 ROS2 Bridge 활성화**: `features/robot/services/rosBridge.ts`를 실제 WebSocket 클라이언트로 교체하여 실 설비 데이터 연동
+- **멀티 로봇 지원**: UR10 외에 UR3, UR5 등 다양한 로봇 모델 동적 로딩 기능
+- **WebXR (AR/VR) 모드**: 모바일/HMD 기기를 통한 몰입형 현장 관제 경험
+- **디지털 트윈 데이터 로깅**: 관절 이동 경로 및 텔레메트리 데이터의 타임라인 기록 및 리플레이 기능
+
+### 관련 문서
+- [리팩토링 및 고도화 설계서](docs/fix/refactoring-plan.md)
+- [로봇 에셋 설정 가이드](docs/guide/robot-asset-setup-guide.md)
 
 ### 라이선스
 MIT License – 자유롭게 사용/수정/포크 가능 (출처 표기 부탁드려요 🙏)

@@ -72,7 +72,7 @@ export class MockRosService {
 
             const jointState: JointState = {
                 header: { stamp: { secs, nsecs }, frame_id: 'base_link' },
-                name: ['shoulder_pan', 'shoulder_lift', 'elbow', 'wrist_1', 'wrist_2', 'wrist_3'],
+                name: ['shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint'],
                 position: [...currentJoints],
                 velocity: [],
                 effort: []
