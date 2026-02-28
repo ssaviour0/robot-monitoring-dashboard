@@ -44,6 +44,9 @@ importers:
       three:
         specifier: ^0.170.0
         version: 0.170.0
+      urdf-loader:
+        specifier: ^0.12.6
+        version: 0.12.6(three@0.170.0)
       zustand:
         specifier: ^5.0.10
         version: 5.0.11(@types/react@18.3.27)(react@18.3.1)(use-sync-external-store@1.6.0(react@18.3.1))
@@ -1611,6 +1614,11 @@ packages:
     hasBin: true
     peerDependencies:
       browserslist: '>= 4.21.0'
+
+  urdf-loader@0.12.6:
+    resolution: {integrity: sha512-EwpgOCPe6Tep2+MXoo/r13keHaKQXMcM+4s9+jX0NRxNS/QSNuP5JPdk5AIgWEoEB43AkEj9Vk+Nr53NkXgSbA==}
+    peerDependencies:
+      three: '>=0.152.0'
 
   uri-js@4.4.1:
     resolution: {integrity: sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==}
@@ -3222,6 +3230,10 @@ snapshots:
       browserslist: 4.28.1
       escalade: 3.2.0
       picocolors: 1.1.1
+
+  urdf-loader@0.12.6(three@0.170.0):
+    dependencies:
+      three: 0.170.0
 
   uri-js@4.4.1:
     dependencies:
