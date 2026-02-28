@@ -44,6 +44,9 @@ importers:
       three:
         specifier: ^0.170.0
         version: 0.170.0
+      three-stdlib:
+        specifier: ^2.36.1
+        version: 2.36.1(three@0.170.0)
       urdf-loader:
         specifier: ^0.12.6
         version: 0.12.6(three@0.170.0)
