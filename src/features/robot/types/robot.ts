@@ -70,6 +70,7 @@ export interface RobotActions {
     toggleWireframe: () => void;
     toggleCollision: () => void;
     toggleIKMode: () => void;
+    setIKMode: (mode: boolean) => void;
     resetRobot: () => void;
 }
 

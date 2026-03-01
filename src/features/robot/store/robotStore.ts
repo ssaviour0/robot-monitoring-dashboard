@@ -91,5 +91,10 @@ export const useRobotStore = create<RobotStore>((set) => ({
             settings: { ...state.settings, isIKMode: !state.settings.isIKMode },
         })),
 
+    setIKMode: (mode) =>
+        set((state) => ({
+            settings: { ...state.settings, isIKMode: mode }
+        })),
+
     resetRobot: () => set(initialState),
 }));

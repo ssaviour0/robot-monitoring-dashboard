@@ -1,4 +1,5 @@
 import { useEffect, useRef, useCallback } from 'react';
+import { useMediaQuery } from '@mui/material';
 import { useThree, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import URDFLoader from 'urdf-loader';
@@ -67,17 +68,18 @@ export const UR10Robot = ({ onLoaded, onError, orbitControlsRef }: UR10RobotProp
     const setJointAngle = useRobotStore((s) => s.setJointAngle);
     const setManualMode = useRobotStore((s) => s.setManualMode);
     const setSelectedJoint = useRobotStore((s) => s.setSelectedJoint);
+    const setIKMode = useRobotStore((s) => s.setIKMode);
 
-    // 모바일에서 IK + Manual 모드 자동 활성화 (오렌지 볼 드래그가 메인 조작)
-    const isMobileQuery = typeof window !== 'undefined' && window.matchMedia('(max-width:900px)').matches;
+    // 모바일 해상도 감지 (900px 미만)
+    const isMobileBreakpoint = useMediaQuery('(max-width:900px)');
+
+    // 모바일 해상도일 때 IK + Manual 모드 강제 활성화
     useEffect(() => {
-        if (isMobileQuery && !isIKMode) {
-            useRobotStore.getState().toggleIKMode();
+        if (isMobileBreakpoint) {
+            if (!isIKMode) setIKMode(true);
+            if (!isManualMode) setManualMode(true);
         }
-        if (isMobileQuery && !isManualMode) {
-            setManualMode(true);
-        }
-    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [isMobileBreakpoint, isIKMode, isManualMode, setIKMode, setManualMode]);
 
     // jointDef 기반 limit 조회 유틸
     const getJointLimit = useCallback((index: number) => {
