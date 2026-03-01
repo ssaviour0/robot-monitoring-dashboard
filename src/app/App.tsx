@@ -2,12 +2,9 @@ import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import { useMediaQuery, Drawer, IconButton } from '@mui/material';
-import { useState } from 'react';
+import { useMediaQuery, IconButton } from '@mui/material';
 import { useRobotStore } from '@features/robot/store/robotStore';
 import {
-    Menu as MenuIcon,
-    ChevronRight,
     Refresh as RefreshIcon,
     Replay as ResetIcon,
     Brightness4 as DarkModeIcon
@@ -16,14 +13,12 @@ import { getTheme } from '@shared/styles/theme';
 import { Button, Stack } from '@mui/material';
 import { useMemo } from 'react';
 import { RobotCanvas } from '@features/robot/components/RobotCanvas';
-import { SidePanel } from '@features/robot/components/SidePanel';
 import { ErrorBoundary } from '@shared/ui/ErrorBoundary';
 import { Footer } from '@shared/ui/layouts/Footer';
 import './styles/index.css';
 
 function App() {
     const isMobile = useMediaQuery('(max-width:900px)');
-    const [mobileOpen, setMobileOpen] = useState(false);
 
     const darkMode = useRobotStore((state) => state.settings.darkMode);
     const toggleDarkMode = useRobotStore((state) => state.toggleDarkMode);
@@ -31,9 +26,6 @@ function App() {
 
     const theme = useMemo(() => getTheme(darkMode ? 'dark' : 'light'), [darkMode]);
 
-    const handleDrawerToggle = () => {
-        setMobileOpen(!mobileOpen);
-    };
 
     return (
         <ThemeProvider theme={theme}>
@@ -118,40 +110,14 @@ function App() {
                                     <IconButton size="small" color="inherit" onClick={toggleDarkMode}>
                                         <DarkModeIcon fontSize="small" color={darkMode ? 'primary' : 'inherit'} />
                                     </IconButton>
-                                    <IconButton color="primary" onClick={handleDrawerToggle} edge="end">
-                                        <MenuIcon />
-                                    </IconButton>
                                 </Box>
                             )}
                         </Box>
                     </Box>
 
-                    {/* Bottom Layer: Sidebar + Content */}
+                    {/* Bottom Layer: Sidebar + Content (SidePanel Removed for full viewport) */}
                     <Box sx={{ display: 'flex', flexGrow: 1, overflow: 'hidden' }}>
 
-                        {/* Responsive Side Panel */}
-                        {isMobile ? (
-                            <Drawer
-                                variant="temporary"
-                                anchor="left"
-                                open={mobileOpen}
-                                onClose={handleDrawerToggle}
-                                ModalProps={{ keepMounted: true }}
-                                sx={{
-                                    display: { xs: 'block', md: 'none' },
-                                    '& .MuiDrawer-paper': { width: 320, bgcolor: 'background.default' },
-                                }}
-                            >
-                                <Box sx={{ display: 'flex', justifyContent: 'flex-end', p: 1 }}>
-                                    <IconButton onClick={handleDrawerToggle}>
-                                        <ChevronRight sx={{ transform: 'rotate(180deg)' }} />
-                                    </IconButton>
-                                </Box>
-                                <SidePanel />
-                            </Drawer>
-                        ) : (
-                            <SidePanel />
-                        )}
 
                         {/* Main Content Area */}
                         <Box sx={{
