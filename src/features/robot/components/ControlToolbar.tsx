@@ -1,6 +1,7 @@
 import { Box, IconButton, Tooltip } from '@mui/material';
 import { Home, GridOn, ViewInAr, KeyboardArrowUp, KeyboardArrowDown, TouchApp, PanTool } from '@mui/icons-material';
 import { useRobotStore } from '../store/robotStore';
+import { useMediaQuery } from '@mui/material';
 import { UR10_JOINT_DEFS } from '../types/robot';
 
 interface ControlToolbarProps {
@@ -22,6 +23,8 @@ export const ControlToolbar = ({ onResetCamera }: ControlToolbarProps) => {
     const toggleIKMode = useRobotStore((s) => s.toggleIKMode);
     const setSelectedJoint = useRobotStore((s) => s.setSelectedJoint);
     const setManualMode = useRobotStore((s) => s.setManualMode);
+
+    const isMobile = useMediaQuery('(max-width:900px)');
 
     const handleToggleIK = () => {
         toggleIKMode();
@@ -47,9 +50,11 @@ export const ControlToolbar = ({ onResetCamera }: ControlToolbarProps) => {
     };
 
     const btnBase = {
-        width: 36, height: 36,
-        // Minimum touch target for mobile
-        minWidth: 36, minHeight: 36,
+        width: isMobile ? 38 : 36,
+        height: isMobile ? 38 : 36,
+        // Minimum touch target for mobile (Apple/Google recommend ~44px, but 42px fits better here)
+        minWidth: isMobile ? 38 : 36,
+        minHeight: isMobile ? 38 : 36,
         transition: 'all 0.15s ease',
     };
 
@@ -65,17 +70,19 @@ export const ControlToolbar = ({ onResetCamera }: ControlToolbarProps) => {
     return (
         <Box sx={{
             position: 'absolute',
-            bottom: 16,
-            right: 16,
+            bottom: { xs: 12, md: 16 },
+            right: { xs: 12, md: 16 },
             zIndex: 10,
             display: 'flex',
             flexDirection: 'column',
-            gap: 0.5,
-            bgcolor: 'rgba(15, 23, 42, 0.9)',
-            backdropFilter: 'blur(16px)',
-            borderRadius: '10px',
-            border: '1px solid rgba(255, 255, 255, 0.08)',
-            p: 0.5,
+            gap: isMobile ? 0.6 : 0.5,
+            // 경량화: 투명도 높임
+            bgcolor: 'rgba(15, 23, 42, 0.65)',
+            backdropFilter: 'blur(8px)',
+            borderRadius: '16px',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            p: 0.6,
+            boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
         }}>
             {/* 관절 네비게이션 (수직) */}
             <Tooltip title="Previous Joint" placement="left">

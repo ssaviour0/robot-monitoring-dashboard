@@ -4,6 +4,7 @@ import { OrbitControls, PerspectiveCamera, Environment, ContactShadows } from '@
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import { useRosBridge } from '../hooks/useRosBridge';
 import { useRobotStore } from '../store/robotStore';
+import { useMediaQuery } from '@mui/material';
 import { UR10Robot } from './UR10Robot';
 import { CanvasLoader } from './CanvasLoader';
 import { JointPanel } from './JointPanel';
@@ -31,6 +32,8 @@ export const RobotCanvas = () => {
         console.error('[UR10Robot] URDF 로딩 실패:', error);
     }, []);
 
+    const isMobile = useMediaQuery('(max-width:900px)');
+
     return (
         <div style={{
             width: '100%',
@@ -39,7 +42,7 @@ export const RobotCanvas = () => {
             background: darkMode
                 ? 'radial-gradient(circle, #1a2c3e 0%, #0a1929 100%)'
                 : 'radial-gradient(circle, #f0f4f8 0%, #d9e2ec 100%)',
-            borderRadius: '16px',
+            borderRadius: isMobile ? '8px' : '16px',
             overflow: 'hidden',
             position: 'relative',
             boxShadow: darkMode
@@ -52,8 +55,8 @@ export const RobotCanvas = () => {
             {/* 3D Canvas 위 오버레이 UI — 모델 로딩 후에만 관절 패널 표시 */}
             {modelLoaded && <JointPanel />}
 
-            {/* 컨트롤 바 (카메라 리셋 등) */}
-            <ControlToolbar onResetCamera={handleResetCamera} />
+            {/* 컨트롤 바 — 모바일에서는 터치 전용이므로 숨김 */}
+            {!isMobile && <ControlToolbar onResetCamera={handleResetCamera} />}
 
             <Suspense fallback={<CanvasLoader />}>
                 <Canvas shadows gl={{ antialias: true, preserveDrawingBuffer: true }}>

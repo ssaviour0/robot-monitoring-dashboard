@@ -1,18 +1,16 @@
 import { useRef, useCallback, useState, useEffect } from 'react';
 import { Box, Typography, IconButton } from '@mui/material';
-import { TouchApp, Close } from '@mui/icons-material';
+import { TouchApp, Close, ExpandMore, ExpandLess } from '@mui/icons-material';
 import { useRobotStore } from '../store/robotStore';
+import { useMediaQuery } from '@mui/material';
 import { UR10_JOINT_DEFS } from '../types/robot';
 import { normalizeJointValue, getJointStatusColor, radToDeg } from '../utils/joint.utils';
 
 /**
- * JointPanel (v2) — 인터랙티브 관절 상태 오버레이
+ * JointPanel (v3) — 모바일 경량 + 데스크탑 풀 패널
  *
- * 개선 사항:
- * 1. 관절 행 클릭 → 해당 관절 선택 (3D 하이라이트 + 하단 조작 UI 표시)
- * 2. 선택된 관절에 회전 다이얼 제공 (터치/드래그)
- * 3. 선택된 관절 강조 표시
- * 4. 모바일 친화: 터치 영역 확대, 포인터 이벤트 활성화
+ * 모바일: 상단 한 줄 가로 칩 + 선택 시 슬림 조작 바
+ * 데스크탑: 기존 세로 리스트 + 조작 패널
  */
 export const JointPanel = () => {
     const jointAngles = useRobotStore((s) => s.jointAngles);
@@ -22,6 +20,8 @@ export const JointPanel = () => {
     const setSelectedJoint = useRobotStore((s) => s.setSelectedJoint);
     const setJointAngle = useRobotStore((s) => s.setJointAngle);
     const setManualMode = useRobotStore((s) => s.setManualMode);
+
+    const isMobile = useMediaQuery('(max-width:900px)');
 
     const statusColor = connectionStatus === 'CONNECTED' ? '#4caf50'
         : connectionStatus === 'CONNECTING' ? '#ff9800' : '#f44336';
@@ -49,7 +49,7 @@ export const JointPanel = () => {
     const handleDialDragMove = useCallback((clientX: number) => {
         if (!isDragging || !dragStartDataRef.current || !selectedDef) return;
         const dx = clientX - dragStartDataRef.current.startX;
-        const sensitivity = 0.01; // 1px = 0.01 rad
+        const sensitivity = 0.01;
         const newAngle = dragStartDataRef.current.startAngle + dx * sensitivity;
         const clamped = Math.max(selectedDef.limitLower, Math.min(selectedDef.limitUpper, newAngle));
         setJointAngle(selectedDef.index, clamped);
@@ -60,7 +60,6 @@ export const JointPanel = () => {
         dragStartDataRef.current = null;
     }, []);
 
-    // 전역 마우스/터치 이벤트 (드래그 범위 확장)
     useEffect(() => {
         if (!isDragging) return;
         const onMove = (e: MouseEvent) => handleDialDragMove(e.clientX);
@@ -83,7 +82,6 @@ export const JointPanel = () => {
         };
     }, [isDragging, handleDialDragMove, handleDialDragEnd]);
 
-    // ─── + / - 버튼 핸들러 (모바일 편의) ───
     const handleNudge = useCallback((delta: number) => {
         if (!selectedDef) return;
         const newAngle = selectedAngle + delta;
@@ -91,6 +89,131 @@ export const JointPanel = () => {
         setJointAngle(selectedDef.index, clamped);
     }, [selectedDef, selectedAngle, setJointAngle]);
 
+    // ════════════════════════════════════════════════════
+    // ▼ 모바일 레이아웃: 3×2 그리드 읽기 전용 텔레메트리 + IK 힌트
+    // ════════════════════════════════════════════════════
+    if (isMobile) {
+        return (
+            <>
+                {/* ── 3×2 조인트 텔레메트리 그리드 ── */}
+                <Box sx={{
+                    position: 'absolute',
+                    top: 6,
+                    left: 6,
+                    right: 6,
+                    zIndex: 10,
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(3, 1fr)',
+                    gap: '4px',
+                    pointerEvents: 'none',
+                    userSelect: 'none',
+                    WebkitUserSelect: 'none',
+                }}>
+                    {UR10_JOINT_DEFS.map((def) => {
+                        const value = jointAngles[def.index] ?? 0;
+                        const normalized = normalizeJointValue(def.name, value);
+                        const barColor = getJointStatusColor(def.name, value);
+                        const deg = radToDeg(value);
+
+                        return (
+                            <Box
+                                key={def.name}
+                                sx={{
+                                    bgcolor: 'rgba(8, 15, 28, 0.6)',
+                                    backdropFilter: 'blur(10px)',
+                                    borderRadius: '10px',
+                                    border: '1px solid rgba(255,255,255,0.06)',
+                                    px: 1,
+                                    pt: 0.6,
+                                    pb: 0.4,
+                                }}
+                            >
+                                {/* 이름 + 값 가로 배치 */}
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', mb: 0.3 }}>
+                                    <Typography sx={{
+                                        fontSize: '0.6rem',
+                                        fontWeight: 700,
+                                        color: 'rgba(255,255,255,0.45)',
+                                        letterSpacing: 0.8,
+                                        textTransform: 'uppercase',
+                                    }}>
+                                        {def.shortName}
+                                    </Typography>
+                                    <Typography sx={{
+                                        fontSize: '0.8rem',
+                                        fontWeight: 900,
+                                        fontFamily: 'monospace',
+                                        color: '#fff',
+                                        lineHeight: 1,
+                                    }}>
+                                        {deg}°
+                                    </Typography>
+                                </Box>
+                                {/* 가로 바 게이지 */}
+                                <Box sx={{
+                                    width: '100%',
+                                    height: 3,
+                                    borderRadius: 2,
+                                    bgcolor: 'rgba(255,255,255,0.06)',
+                                    overflow: 'hidden',
+                                }}>
+                                    <Box sx={{
+                                        height: '100%',
+                                        width: `${normalized * 100}%`,
+                                        borderRadius: 2,
+                                        bgcolor: barColor,
+                                        transition: 'width 0.15s ease-out',
+                                    }} />
+                                </Box>
+                            </Box>
+                        );
+                    })}
+                </Box>
+
+                {/* ── IK 드래그 힌트 (하단 중앙) ── */}
+                <Box sx={{
+                    position: 'absolute',
+                    bottom: 12,
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    zIndex: 10,
+                    pointerEvents: 'none',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 0.8,
+                    px: 1.8,
+                    py: 0.6,
+                    borderRadius: '20px',
+                    bgcolor: 'rgba(255, 107, 53, 0.15)',
+                    backdropFilter: 'blur(8px)',
+                    border: '1px solid rgba(255, 107, 53, 0.3)',
+                    '@keyframes ikHint': {
+                        '0%, 100%': { opacity: 0.65 },
+                        '50%': { opacity: 1 },
+                    },
+                    animation: 'ikHint 3s ease-in-out infinite',
+                }}>
+                    <Box sx={{
+                        width: 8, height: 8, borderRadius: '50%',
+                        bgcolor: '#ff6b35',
+                        boxShadow: '0 0 6px rgba(255,107,53,0.6)',
+                    }} />
+                    <Typography sx={{
+                        fontSize: '0.6rem',
+                        fontWeight: 700,
+                        color: 'rgba(255,255,255,0.75)',
+                        letterSpacing: 0.3,
+                    }}>
+                        Drag orange ball to move
+                    </Typography>
+                </Box>
+            </>
+        );
+    }
+
+    // ════════════════════════════════════════════════════
+    // ▼ 데스크탑 레이아웃: 기존 세로 리스트 (변경 없음)
+    // ════════════════════════════════════════════════════
     return (
         <Box sx={{
             position: 'absolute',
@@ -100,16 +223,17 @@ export const JointPanel = () => {
             minWidth: 220,
             maxWidth: 260,
             maxHeight: '75%',
-            bgcolor: 'rgba(15, 23, 42, 0.9)',
-            backdropFilter: 'blur(16px)',
+            bgcolor: 'rgba(15, 23, 42, 0.75)',
+            backdropFilter: 'blur(12px)',
             borderRadius: '12px',
-            border: '1px solid rgba(255, 255, 255, 0.08)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
             p: 1.5,
             color: '#fff',
             pointerEvents: 'auto',
             overflow: 'auto',
             userSelect: 'none',
             WebkitUserSelect: 'none',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.25)',
         }}>
             {/* Header */}
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1, px: 0.5 }}>
@@ -131,7 +255,7 @@ export const JointPanel = () => {
                 </Box>
             </Box>
 
-            {/* Joint Rows — 클릭으로 선택 */}
+            {/* Joint Rows */}
             {UR10_JOINT_DEFS.map((def) => {
                 const value = jointAngles[def.index] ?? 0;
                 const normalized = normalizeJointValue(def.name, value);
@@ -157,7 +281,6 @@ export const JointPanel = () => {
                                 bgcolor: 'rgba(0, 229, 255, 0.25)',
                                 transform: 'scale(0.98)',
                             },
-                            // 모바일: 터치 영역 최소 44px
                             minHeight: '36px',
                             display: 'flex',
                             flexDirection: 'column',
@@ -213,9 +336,8 @@ export const JointPanel = () => {
                         </IconButton>
                     </Box>
 
-                    {/* 방향 조작: ◀ [드래그 바] ▶ */}
+                    {/* [−] [드래그 바] [+] */}
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                        {/* - 버튼 */}
                         <Box
                             onClick={() => handleNudge(-0.1)}
                             sx={{
@@ -234,7 +356,6 @@ export const JointPanel = () => {
                             −
                         </Box>
 
-                        {/* 드래그 바 */}
                         <Box
                             ref={dialRef}
                             onMouseDown={(e) => handleDialDragStart(e.clientX)}
@@ -253,7 +374,6 @@ export const JointPanel = () => {
                                 transition: 'border 0.1s',
                             }}
                         >
-                            {/* 진행 바 */}
                             <Box sx={{
                                 position: 'absolute',
                                 left: 0, top: 0, bottom: 0,
@@ -261,7 +381,6 @@ export const JointPanel = () => {
                                 bgcolor: 'rgba(0, 229, 255, 0.2)',
                                 transition: isDragging ? 'none' : 'width 0.08s',
                             }} />
-                            {/* 중앙 텍스트 */}
                             <Box sx={{
                                 position: 'absolute', inset: 0,
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -275,7 +394,6 @@ export const JointPanel = () => {
                                     {radToDeg(selectedAngle)}°
                                 </Typography>
                             </Box>
-                            {/* 드래그 힌트 화살표 */}
                             {!isDragging && (
                                 <Box sx={{
                                     position: 'absolute', inset: 0,
@@ -288,7 +406,6 @@ export const JointPanel = () => {
                             )}
                         </Box>
 
-                        {/* + 버튼 */}
                         <Box
                             onClick={() => handleNudge(0.1)}
                             sx={{

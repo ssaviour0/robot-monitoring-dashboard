@@ -68,6 +68,17 @@ export const UR10Robot = ({ onLoaded, onError, orbitControlsRef }: UR10RobotProp
     const setManualMode = useRobotStore((s) => s.setManualMode);
     const setSelectedJoint = useRobotStore((s) => s.setSelectedJoint);
 
+    // 모바일에서 IK + Manual 모드 자동 활성화 (오렌지 볼 드래그가 메인 조작)
+    const isMobileQuery = typeof window !== 'undefined' && window.matchMedia('(max-width:900px)').matches;
+    useEffect(() => {
+        if (isMobileQuery && !isIKMode) {
+            useRobotStore.getState().toggleIKMode();
+        }
+        if (isMobileQuery && !isManualMode) {
+            setManualMode(true);
+        }
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
     // jointDef 기반 limit 조회 유틸
     const getJointLimit = useCallback((index: number) => {
         const def = UR10_JOINT_DEFS[index];
