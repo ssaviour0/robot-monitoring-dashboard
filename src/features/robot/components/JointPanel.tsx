@@ -1,6 +1,6 @@
 import { useRef, useCallback, useState, useEffect } from 'react';
 import { Box, Typography, IconButton } from '@mui/material';
-import { TouchApp, Close, ExpandMore, ExpandLess } from '@mui/icons-material';
+import { TouchApp, Close } from '@mui/icons-material';
 import { useRobotStore } from '../store/robotStore';
 import { useMediaQuery } from '@mui/material';
 import { UR10_JOINT_DEFS } from '../types/robot';
